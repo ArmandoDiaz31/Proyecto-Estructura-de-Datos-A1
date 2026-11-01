@@ -8,6 +8,18 @@
  * @author diegoarvelo
  */
 public class Grafo {
-    //Aun no veo que se aniada al commit... PROBANDO.
-    //Estoy probando el commit
+    private Lista<Estacion> Estaciones;
+    
+    public Grafo(){
+        this.Estaciones = new Lista();
+    }
+    
+    public Estacion buscarEstacion(String Nombre){
+        for (Estacion estacion: Estaciones){
+            if (estacion.getNombre().equalsIgnoreCase(Nombre.trim())){
+                return estacion;
+            }
+        }
+        return null;
+    }
 }
