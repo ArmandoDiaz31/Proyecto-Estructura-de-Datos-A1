@@ -7,6 +7,9 @@
  *
  * @author josea
  */
+
+import javax.swing.JOptionPane;
+
 public class PanelPrincipal extends javax.swing.JFrame {
     
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(PanelPrincipal.class.getName());
@@ -22,9 +25,75 @@ public class PanelPrincipal extends javax.swing.JFrame {
     //Menú Archivo
     itemUpload.addActionListener(e -> accionCargar());
     itemSave.addActionListener(e -> accionGuardar());
-    itemExit.addActionListener(e -> confimarSalida());
+    itemExit.addActionListener(e -> confirmarSalida());
+    
+    //Menú Red
+    itemAddStation.addActionListener(e -> accionAgregarEstacion());
+    itemAddConection.addActionListener(e -> accionAgregarConexion());
+    itemDeleteStation.addActionListener(e -> accionEliminarEstacion());
+    
+    //Menú Análisis
+    itemSubNets.addActionListener(e -> accionSubredes());
+    itemRoute.addActionListener(e -> accionRutaOptima());
+    itemHubs.addActionListener(e -> accionHubs());
+    
+    //Menú Ayuda
+    itemHelp.addActionListener(e -> accionAyuda());
+    
+    //Botones del panel derecho
+    btRuta.addActionListener (e -> accionRutaOptima());
+    btSubredes.addActionListener (e -> accionSubredes());
+    btHubs.addActionListener (e -> accionHubs());
+    btClear.addActionListener (e -> accionLimpiar());
     }
-
+    
+    private void aviso(String mensaje) {
+    JOptionPane.showMessageDialog(this, mensaje);
+    }
+    
+    private void accionCargar(){
+    aviso("Cargar archivos(Pendiente)");
+    }
+    
+    private void accionGuardar(){
+    aviso("Guardar cambios(Pendiente)");
+    }
+    
+    private void confirmarSalida(){
+    aviso("Salir (Pendiente)");
+    }
+    
+    private void accionAgregarEstacion(){
+    aviso("Agregar estacion(Pendiente)");
+    }
+    
+    private void accionAgregarConexion(){
+    aviso("Agregar conexion(Pendiente)");
+    }
+    
+    private void accionEliminarEstacion(){
+    aviso("Eliminar estacion(Pendiente)");
+    }
+    
+    private void accionSubredes(){
+    areaResults.setText("Subredes (Pendiente)");
+    }
+    
+    private void accionRutaOptima(){
+    areaResults.setText("Ruta mas corta (Pendiente)");
+    }
+    
+    private void accionHubs(){
+    areaResults.setText("Hubs (Pendiente)");
+    }
+    
+    private void accionAyuda(){
+    aviso("Ayuda (Pendiente)");
+    }
+    
+    private void accionLimpiar(){
+    areaResults.setText("");
+    }
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
