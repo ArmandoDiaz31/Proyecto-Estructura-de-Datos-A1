@@ -112,7 +112,6 @@ public class PanelPrincipal extends javax.swing.JFrame {
         btSubredes = new javax.swing.JButton();
         btHubs = new javax.swing.JButton();
         btClear = new javax.swing.JButton();
-        grafoPanel1 = new GrafoPanel();
         jPanel3 = new javax.swing.JPanel();
         jScrollPane2 = new javax.swing.JScrollPane();
         areaResults = new javax.swing.JTextArea();
@@ -162,17 +161,6 @@ public class PanelPrincipal extends javax.swing.JFrame {
 
         btClear.setText("Limpiar resultado");
         jPanel1.add(btClear);
-
-        javax.swing.GroupLayout grafoPanel1Layout = new javax.swing.GroupLayout(grafoPanel1);
-        grafoPanel1.setLayout(grafoPanel1Layout);
-        grafoPanel1Layout.setHorizontalGroup(
-            grafoPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 457, Short.MAX_VALUE)
-        );
-        grafoPanel1Layout.setVerticalGroup(
-            grafoPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 0, Short.MAX_VALUE)
-        );
 
         jPanel3.setPreferredSize(new java.awt.Dimension(0, 150));
         jPanel3.setLayout(new java.awt.BorderLayout());
@@ -247,8 +235,7 @@ public class PanelPrincipal extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addComponent(grafoPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGap(0, 465, Short.MAX_VALUE)
                         .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
@@ -257,9 +244,7 @@ public class PanelPrincipal extends javax.swing.JFrame {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(grafoPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
@@ -317,7 +302,6 @@ public class PanelPrincipal extends javax.swing.JFrame {
     private javax.swing.JButton btSubredes;
     private javax.swing.JComboBox<String> cbDestino;
     private javax.swing.JComboBox<String> cbOrigen;
-    private GrafoPanel grafoPanel1;
     private javax.swing.JMenuItem itemAddConection;
     private javax.swing.JMenuItem itemAddStation;
     private javax.swing.JMenuItem itemDeleteStation;
