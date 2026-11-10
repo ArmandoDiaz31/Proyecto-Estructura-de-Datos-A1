@@ -1,3 +1,5 @@
+package urbanroute.modelo;
+
 /*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
@@ -7,11 +9,13 @@
  *
  * @author diegoarvelo
  */
+import TDA.ListaEnlazada;
+
 public class Grafo {
-    private Lista<Estacion> Estaciones;
+    private ListaEnlazada<Estacion> Estaciones;
     
     public Grafo(){
-        this.Estaciones = new Lista();
+        this.Estaciones = new ListaEnlazada("Estaciones");
     }
     
     public Estacion buscarEstacion(String Nombre){
