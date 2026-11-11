@@ -46,16 +46,25 @@ public GrafoPanel() {
     vista = (org.graphstream.ui.swing_viewer.ViewPanel) visor.addDefaultView(false);
     add(vista, java.awt.BorderLayout.CENTER);
     
-visual.addNode("A").setAttribute("ui.label", "A");
-visual.addNode("B").setAttribute("ui.label", "B");
-visual.addEdge("AB", "A", "B");
-visual.addNode("C").setAttribute("ui.label", "C");
-visual.addEdge("BC", "B", "C");
-marcarNodo("A", "ruta");
-marcarNodo("B", "ruta");
-marcarArista("AB", "ruta");
-marcarNodo("C", "hub");
+
 }
+private static final String[] colors = {"#E74C3C", "#3498DB", "#2ECC71", "#F39C12", "#9B59B6", "#1ABC9C"};
+
+private String[] id_indice = new String[0];
+
+public void colorSubredes(int[] subred) {
+    for (int i = 0; i < subred.length; i++) {
+        if (i >= id_indice.length) { 
+            break; 
+        }
+        String color = colors[subred[i] % colors.length];
+        org.graphstream.graph.Node n = visual.getNode(id_indice[i]);
+        if (n != null) {
+            n.setAttribute("ui.style", "fill-color: " + color + ";");
+        }
+    }
+}
+
 public void marcarNodo(String id, String clase) {
     if (visual.getNode(id) != null) {
         visual.getNode(id).setAttribute("ui.class", clase);
@@ -72,6 +81,7 @@ public void clearMarcar() {
     visual.nodes().forEach(n -> n.removeAttribute("ui.class"));
     visual.edges().forEach(e -> e.removeAttribute("ui.class"));
 }
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
