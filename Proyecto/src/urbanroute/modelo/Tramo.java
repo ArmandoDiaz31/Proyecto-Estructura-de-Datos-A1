@@ -10,10 +10,16 @@ package urbanroute.modelo;
  * @author diegoarvelo
  */
 public class Tramo {
-    private Estacion Destino;
+    private final Estacion Destino;
     private int TiempoMinutos;
     
     public Tramo(Estacion Destino, int TiempoMinutos){
+        if (Destino == null){
+            throw new IllegalArgumentException("La estacion destino no puede ser nula.");
+        }
+        if (TiempoMinutos <= 0){
+            throw new IllegalArgumentException("El tiempo de traslado debe ser mayor a 0 minutos.");
+        }
         this.Destino = Destino;
         this.TiempoMinutos = TiempoMinutos;
     }
@@ -24,5 +30,12 @@ public class Tramo {
     
     public int getTiempoMinutos(){
         return TiempoMinutos;
+    }
+    
+    public void setTiempoMinutos(int TiempoMinutos){
+        if (TiempoMinutos <= 0){
+            throw new IllegalArgumentException("El tiempo de traslado debe ser mayor a 0 minutos.");
+        }
+        this.TiempoMinutos = TiempoMinutos;
     }
 }

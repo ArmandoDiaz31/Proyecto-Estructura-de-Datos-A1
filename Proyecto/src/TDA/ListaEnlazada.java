@@ -10,13 +10,28 @@ package TDA;
  */
 public class ListaEnlazada <T> {
     private Nodo <T> pFirst;
+    private Nodo <T> pLast;
     private int iN;
     private String name;
     
-    public Lista (String s){
-        this.name = s;
+    public ListaEnlazada(){
+        this("");
+    }
+    
+    public ListaEnlazada (String s){
+        if (s == null){
+            this.name = "";
+        }
+        else{
+            this.name = s;
+        }
         this.pFirst = null;
+        this.pLast = null;
         this.iN = 0;
+    }
+    
+    public String getName(){
+        return name;
     }
     
     public int Tamano(){
@@ -31,12 +46,21 @@ public class ListaEnlazada <T> {
         return this.pFirst;
     }
     
-    public T Leer(Nodo<T> pValor){
-        return pValor.info;
-    }
-    
     public Nodo<T> Ultimo(){
         return null;
+    }
+    
+    public Nodo <T> Final(){
+        return this.pLast;
+    }
+    
+    public T Leer(Nodo<T> pValor){
+        if (pValor == null){
+            return null;
+        }
+        else{
+            return pValor.info;
+        }
     }
     
     public Nodo<T> Proximo(Nodo<T> pValor){
@@ -48,29 +72,69 @@ public class ListaEnlazada <T> {
         }
     }
     public void Insertar(T x, Nodo<T> pValor){
-        Nodo <T> pNew =new Nodo<> (x);
-        if (this.EsVacio()){
-            this.pFirst=pNew;
-            iN++;
+        if (pValor == Ultimo() || this.EsVacio()){
+            InsertarAlFinal(x);
+            return;
         }
-        else{
-            if (pValor != this.Ultimo()){
-                pNew.pNext=pValor.pNext;
-                pValor.pNext=pNew;
-                this.iN++;
-            }
+        Nodo <T> pNew = new Nodo<>(x);
+        pNew.pNext = pValor.pNext;
+        pValor.pNext = pNew;
+        if (pValor == this.pLast){
+            this.pLast = pNew;
         }
+        this.iN++;
     }
-    public Nodo<T> Final(){
-        if (this.EsVacio()){
-            return null;
-        }
-        else{
-            Nodo<T> pAux = this.Primero();
-            while (pAux.pNext != this.Ultimo()){
-                pAux = this.Proximo(pAux);
-            }
-            return pAux;
-        }
-    }
+    
+   public void InsertarAlFinal(T x){
+       Nodo <T> pNew = new Nodo<>(x);
+       if (this.pFirst == null){
+           this.pFirst = pNew;
+           this.pLast = pNew;
+       }
+       else{
+           this.pLast.pNext = pNew;
+           this.pLast = pNew;
+       }
+       this.iN++;
+   }
+   
+   public boolean Eliminar(T x){
+       Nodo <T> pAnt = null;
+       Nodo <T> pAux = this.pFirst;
+       
+       while (pAux != null){
+           boolean coincide = false;
+           if (pAux.info == x){
+               coincide = true;
+           }
+           else if (x != null){
+               if (x.equals(pAux.info)){
+                   coincide = true;
+               }
+           }
+           
+           if (coincide){
+               if (pAnt == null){
+                   this.pFirst = pAux.pNext;
+               }
+               else {
+                   pAnt.pNext = pAux.pNext;
+               }
+               if (pAux == this.pLast){
+                   this.pLast = pAnt;
+               }
+               this.iN--;
+               return true;
+           }
+           pAnt = pAux;
+           pAux = pAux.pNext;
+       }
+       return false;
+   }
+   
+   public void Limpiar(){
+       this.pFirst = null;
+       this.pLast = null;
+       this.iN = 0;
+   }
 }
