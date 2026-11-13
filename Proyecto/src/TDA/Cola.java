@@ -32,7 +32,7 @@ public class Cola <T> {
         iN++;
     }
     
-    public T desencolar(){
+    public T Desencolar(){
         if (EsVacio()){
             return null;
         }
