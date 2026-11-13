@@ -41,7 +41,7 @@ public class Grafo {
         }
     }
     
-    private Estacion[] Estaciones;
+    private Estacion[] estaciones;
     private ListaEnlazada<Tramo>[] Adyacentes;
     private int CantidadEstaciones;
     private int CantidadConexiones;
@@ -49,7 +49,7 @@ public class Grafo {
     private TablaHash IndicePorNombre;
     
     public Grafo(){
-        this.Estaciones = new Estacion[CAPACIDAD_INICIAL];
+        this.estaciones = new Estacion[CAPACIDAD_INICIAL];
         this.Adyacentes = (ListaEnlazada<Tramo>[]) new ListaEnlazada[CAPACIDAD_INICIAL];
         this.CantidadEstaciones = 0;
         this.CantidadConexiones = 0;
@@ -58,7 +58,7 @@ public class Grafo {
     }
     
     public void Limpiar(){
-        this.Estaciones = new Estacion[CAPACIDAD_INICIAL];
+        this.estaciones = new Estacion[CAPACIDAD_INICIAL];
         this.Adyacentes = (ListaEnlazada<Tramo>[]) new ListaEnlazada[CAPACIDAD_INICIAL];
         this.CantidadEstaciones = 0;
         this.CantidadConexiones = 0;
@@ -78,19 +78,19 @@ public class Grafo {
         
         int idx = CantidadEstaciones;
         e.setIndice(idx);
-        Estaciones[idx] = e;
+        estaciones[idx] = e;
         Adyacentes[idx] = new ListaEnlazada<>("Adyacente_"+ e.getId());
         CantidadEstaciones++;
         
         IndicePorID.insertar(ClaveID, e);
         String ClaveNombre = NormalizarClave(e.getNombre());
-        if (!ClaveNombre.EsVacio() && !IndicePorNombre.contiene(ClaveNombre)){
+        if (!ClaveNombre.isEmpty() && !IndicePorNombre.contiene(ClaveNombre)){
             IndicePorNombre.insertar(ClaveNombre, e);
         }
     }
     
     public Estacion ObtenerEstacion(String Clave){
-        if (Clave == null || Clave.trim().EsVacio()){
+        if (Clave == null || Clave.trim().isEmpty()){
             return null;
         }
         String Normal = NormalizarClave(Clave);
@@ -109,7 +109,7 @@ public class Grafo {
         if (Indice < 0 || Indice >= CantidadEstaciones){
             return null;
         }
-        return Estaciones[Indice];
+        return estaciones[Indice];
     }
     
     public ListaEnlazada<Tramo> ObtenerAdyacentesPorIndice(int Indice){
@@ -122,7 +122,7 @@ public class Grafo {
     public Estacion[] ObtenerTodasLasEstaciones(){
         Estacion[] pCopia = new Estacion[CantidadEstaciones];
         for (int i = 0; i < CantidadEstaciones; i++){
-            pCopia[i] = Estaciones[i];
+            pCopia[i] = estaciones[i];
         }
         return pCopia;
     }
@@ -182,7 +182,7 @@ public class Grafo {
         if(Objetivo == null){
             return null;
         }
-        int idx = objetivo.getIndice();
+        int idx = Objetivo.getIndice();
         
         Nodo<Tramo> pAux = Adyacentes[idx].Primero();
         while (pAux != null){
@@ -195,23 +195,23 @@ public class Grafo {
             pAux = pAux.getSiguiente();
         }
         
-        IndicePorID.Eliminar(NormalizarClave(Objetivo.getId()));
+        IndicePorID.eliminar(NormalizarClave(Objetivo.getId()));
         String ClaveNombre = NormalizarClave(Objetivo.getNombre());
-        if (!ClaveNombre.EsVacio() && IndicePorNombre.buscar(ClaveNombre) == Objetivo){
+        if (!ClaveNombre.isEmpty() && IndicePorNombre.buscar(ClaveNombre) == Objetivo){
             IndicePorNombre.eliminar(ClaveNombre);
             for(int i = 0; i < CantidadEstaciones; i++){
-                if (i != idx && NormalizarClave(Estaciones[i].getNombre()).equals(ClaveNombre)){
-                    IndicePorNombre.insertar(ClaveNombre, Estaciones[i]);
+                if (i != idx && NormalizarClave(estaciones[i].getNombre()).equals(ClaveNombre)){
+                    IndicePorNombre.insertar(ClaveNombre, estaciones[i]);
                     break;
                 }
             }
         }
         for (int i = idx; i < CantidadEstaciones - 1; i ++){
-            Estaciones[i] = Estaciones[i + 1];
+            estaciones[i] = estaciones[i + 1];
             Adyacentes[i] = Adyacentes [i + 1];
-            Estaciones[i].setIndice( -1);
+            estaciones[i].setIndice( -1);
         }
-        Estaciones[CantidadEstaciones - 1] = null;
+        estaciones[CantidadEstaciones - 1] = null;
         Adyacentes[CantidadEstaciones - 1] = null;
         CantidadEstaciones--;
         Objetivo.setIndice(-1);
@@ -223,7 +223,7 @@ public class Grafo {
         if (IndiceOrigen < 0 || IndiceOrigen >= CantidadEstaciones || IndiceDestino < 0 || IndiceDestino >= CantidadEstaciones){
             return 0;
         }
-        Tramo t = BuscarTramo(IndiceOrigen, Estaciones[IndiceDestino]);
+        Tramo t = BuscarTramo(IndiceOrigen, estaciones[IndiceDestino]);
         if (t == null){
             return 0;
         }
@@ -276,7 +276,7 @@ public class Grafo {
             int minDist = Integer.MAX_VALUE;
             for (int i = 0; i < n; i++){
                 if (!Visitado[i] && Dist[i] < minDist){
-                    minDist[i] = Dist[i];
+                    minDist = Dist[i];
                     u = i;
                 }
             }
@@ -310,7 +310,7 @@ public class Grafo {
         Estacion[] Camino = new Estacion[Pasos];
         int Posicion = Pasos -1;
         for (int temp = idxDest; temp != -1; temp = Previo[temp]){
-            Camino[Posicion--] = Estaciones[temp];
+            Camino[Posicion--] = estaciones[temp];
         }
         
         return new ResultadoRuta(Camino, Dist[idxDest], true);
@@ -325,7 +325,7 @@ public class Grafo {
         ListaEnlazada<Estacion[]> ListaSubredes = new ListaEnlazada<>("Subredes");
         Cola<Integer> Cola = new Cola<>();
         
-        for (int = 0; i < CantidadEstaciones; i++){
+        for (int i = 0; i < CantidadEstaciones; i++){
             if (!Visitado[i]){
                 ListaEnlazada<Estacion> Componente = new ListaEnlazada<>("Componente");
                 Visitado[i] = true;
@@ -333,7 +333,7 @@ public class Grafo {
                 
                 while (!Cola.EsVacio()){
                     int u = Cola.Desencolar();
-                    Componente.InsertarAlFinal(Estaciones[u]);
+                    Componente.InsertarAlFinal(estaciones[u]);
                     
                     Nodo<Tramo> NodoAdyac = Adyacentes[u].Primero();
                     while (NodoAdyac != null){
@@ -409,17 +409,17 @@ public class Grafo {
     }
     
     private void AsegurarCapacidad(){
-        if (CantidadEstaciones < Estaciones.length){
+        if (CantidadEstaciones < estaciones.length){
             return;
         }
-        int NewCap = Estaciones.length * 2;
-        Estacion[] NewEst = new Estacion[NuevaCap];
+        int NewCap = estaciones.length * 2;
+        Estacion[] NewEst = new Estacion[NewCap];
         ListaEnlazada<Tramo>[] NewAdyac = (ListaEnlazada<Tramo>[]) new ListaEnlazada[NewCap];
         for (int i = 0; i < CantidadEstaciones; i++){
-            NewEst[i] = Estaciones[i];
+            NewEst[i] = estaciones[i];
             NewAdyac[i] = Adyacentes[i];
         }
-        this.Estaciones = NewEst;
+        this.estaciones = NewEst;
         this.Adyacentes = NewAdyac;
     }
     
