@@ -7,6 +7,7 @@ import java.io.File;
 import urbanroute.archivos.GestorArchivo;
 import urbanroute.modelo.Estacion;
 import TDA.Grafo;
+import urbanroute.modelo.AnalisisRed;
 
 /**
  *
@@ -14,6 +15,7 @@ import TDA.Grafo;
  */
 public class PanelPrincipalController {
     private Grafo grafo;
+    private AnalisisRed analisis;
     private GestorArchivo gestor;
     private File archivoEstaciones;
     private File archivoConexiones;
@@ -85,6 +87,7 @@ public class PanelPrincipalController {
 
     public void iniciar() {
         grafo = new Grafo();
+        analisis = new AnalisisRed(grafo);
         gestor = new GestorArchivo();
         conectarEventos();
         cargarMaestroInicial();
@@ -129,9 +132,31 @@ public class PanelPrincipalController {
     JOptionPane.showMessageDialog(ventana, mensaje);
     }
     
-    private void accionCargar(){
-    aviso("Cargar archivos(Pendiente)");
+    private void accionCargar() {
+    if (cambiosSinGuardar) {
+        int r = JOptionPane.showConfirmDialog(ventana,
+                "Hay cambios sin guardar. ¿Desea guardarlos antes de cargar otros archivos?",
+                "Cambios sin guardar",
+                JOptionPane.YES_NO_CANCEL_OPTION,
+                JOptionPane.WARNING_MESSAGE);
+        if (r == JOptionPane.CANCEL_OPTION || r == JOptionPane.CLOSED_OPTION) {
+            return;
+        }
+        if (r == JOptionPane.YES_OPTION) {
+            accionGuardar();
+        }
     }
+
+    File est = chooseFile("Seleccione el archivo de ESTACIONES");
+    if (est == null) {
+        return;
+    }
+    File con = chooseFile("Seleccione el archivo de CONEXIONES");
+    if (con == null) {
+        return;
+    }
+    loadFrom(est, con);
+}
     
     private void accionGuardar(){
     aviso("Guardar cambios(Pendiente)");
@@ -185,7 +210,7 @@ public class PanelPrincipalController {
     }
 }
     
-    private void cargarMaestroInicial() {
+    private void loadOrigin() {
     }
 
     private void refresh() {
