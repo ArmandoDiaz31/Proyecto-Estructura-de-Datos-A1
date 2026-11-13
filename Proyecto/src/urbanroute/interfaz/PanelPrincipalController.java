@@ -85,54 +85,54 @@ public class PanelPrincipalController {
         this.itemHelp = itemHelp;
     }
 
-    public void iniciar() {
+    public void start() {
         grafo = new Grafo();
         analisis = new AnalisisRed(grafo);
         gestor = new GestorArchivo();
-        conectarEventos();
-        cargarMaestroInicial();
+        connectEvents();
+        loadOrigin();
         refresh();
     }
 
-    private void conectarEventos(){
+    private void connectEvents(){
     //Menú Archivo
-    itemUpload.addActionListener(e -> accionCargar());
-    itemSave.addActionListener(e -> accionGuardar());
-    itemExit.addActionListener(e -> confirmSalida());
+    itemUpload.addActionListener(e -> actionUpload());
+    itemSave.addActionListener(e -> actionSave());
+    itemExit.addActionListener(e -> confirmExit());
     
     //Menú Red
-    itemAddStation.addActionListener(e -> accionAgregarEstacion());
-    itemAddConection.addActionListener(e -> accionAgregarConexion());
-    itemDeleteStation.addActionListener(e -> accionEliminarEstacion());
+    itemAddStation.addActionListener(e -> actionAddStation());
+    itemAddConection.addActionListener(e -> actionAddConnection());
+    itemDeleteStation.addActionListener(e -> actionDeleteStation());
     
     //Menú Análisis
-    itemSubNets.addActionListener(e -> accionSubredes());
-    itemRoute.addActionListener(e -> accionRutaOptima());
-    itemHubs.addActionListener(e -> accionHubs());
+    itemSubNets.addActionListener(e -> actionSubnets());
+    itemRoute.addActionListener(e -> actionRoute());
+    itemHubs.addActionListener(e -> actionHubs());
     
     //Menú Ayuda
-    itemHelp.addActionListener(e -> accionAyuda());
+    itemHelp.addActionListener(e -> actionHelp());
     
     //Botones del panel derecho
-    btRuta.addActionListener (e -> accionRutaOptima());
-    btSubredes.addActionListener (e -> accionSubredes());
-    btHubs.addActionListener (e -> accionHubs());
-    btClear.addActionListener (e -> accionLimpiar());
+    btRuta.addActionListener (e -> actionRoute());
+    btSubredes.addActionListener (e -> actionSubnets());
+    btHubs.addActionListener (e -> actionHubs());
+    btClear.addActionListener (e -> actionClear());
     
     ventana.addWindowListener(new WindowAdapter() {
     @Override
     public void windowClosing(WindowEvent e) {
-        confirmSalida();
+        confirmExit();
     }
 });
     
     }
     
-    private void aviso(String mensaje) {
+    private void advise(String mensaje) {
     JOptionPane.showMessageDialog(ventana, mensaje);
     }
     
-    private void accionCargar() {
+    private void actionUpload() {
     if (cambiosSinGuardar) {
         int r = JOptionPane.showConfirmDialog(ventana,
                 "Hay cambios sin guardar. ¿Desea guardarlos antes de cargar otros archivos?",
@@ -142,8 +142,8 @@ public class PanelPrincipalController {
         if (r == JOptionPane.CANCEL_OPTION || r == JOptionPane.CLOSED_OPTION) {
             return;
         }
-        if (r == JOptionPane.YES_OPTION) {
-            accionGuardar();
+           if (r == JOptionPane.YES_OPTION && !actionSave()) {
+            return;
         }
     }
 
@@ -158,44 +158,71 @@ public class PanelPrincipalController {
     loadFrom(est, con);
 }
     
-    private void accionGuardar(){
-    aviso("Guardar cambios(Pendiente)");
+    private boolean actionSave(){
+     File est = archivoEstaciones;
+        File con = archivoConexiones;
+ 
+        
+        if (est == null || con == null) {
+            est = chooseSaveFile("Guardar ESTACIONES como...");
+            if (est == null) {
+                return false;
+            }
+            con = chooseSaveFile("Guardar CONEXIONES como...");
+            if (con == null) {
+                return false;
+            }
+        }
+ 
+        try {
+            gestor.guardarEstaciones(grafo, est);
+            gestor.guardarConexiones(grafo, con);
+        } catch (java.io.IOException | RuntimeException ex) {
+            showError("No se pudo guardar", ex.getMessage());
+            return false;
     }
+          archivoEstaciones = est;
+        archivoConexiones = con;
+        cambiosSinGuardar = false;
+        refresh();
+        return true;
+    }
+
     
-    private void confirmSalida(){
+    private void confirmExit(){
     ventana.dispose();
     System.exit(0);
     }
     
-    private void accionAgregarEstacion(){
-    aviso("Agregar estacion(Pendiente)");
+    private void actionAddStation(){
+    advise("Agregar estacion(Pendiente)");
     }
     
-    private void accionAgregarConexion(){
-    aviso("Agregar conexion(Pendiente)");
+    private void actionAddConnection(){
+    advise("Agregar conexion(Pendiente)");
     }
     
-    private void accionEliminarEstacion(){
-    aviso("Eliminar estacion(Pendiente)");
+    private void actionDeleteStation(){
+    advise("Eliminar estacion(Pendiente)");
     }
     
-    private void accionSubredes(){
+    private void actionSubnets(){
     areaResults.setText("Subredes (Pendiente)");
     }
     
-    private void accionRutaOptima(){
+    private void actionRoute(){
     areaResults.setText("Ruta mas corta (Pendiente)");
     }
     
-    private void accionHubs(){
+    private void actionHubs(){
     areaResults.setText("Hubs (Pendiente)");
     }
     
-    private void accionAyuda(){
-    aviso("Ayuda (Pendiente)");
+    private void actionHelp(){
+    advise("Ayuda (Pendiente)");
     }
     
-    private void accionLimpiar(){
+    private void actionClear(){
         areaResults.setText("");
         grafoPanel1.clearMarcar();
     
@@ -214,7 +241,7 @@ public class PanelPrincipalController {
     File est = gestor.getArchivoEstacionesMaestro();
     File con = gestor.getArchivoConexionesMaestro();
     if (!est.exists() || !con.exists()) {
-        showAdvice("No se encontró el archivo maestro; use Archivo > Cargar");
+        showAdvice("Aviso", "No se encontró el archivo maestro; use Archivo > Cargar");
         return;
     }
     loadFrom(est, con);
@@ -223,9 +250,7 @@ public class PanelPrincipalController {
     JOptionPane.showMessageDialog(ventana, mensaje, titulo, JOptionPane.ERROR_MESSAGE);
 }
 
-private void showAdvice(String mensaje) {
-    JOptionPane.showMessageDialog(ventana, mensaje, "Aviso", JOptionPane.WARNING_MESSAGE);
-}
+
 
 private void showAdvice(String titulo, String mensaje) {
     Object content = mensaje;
@@ -237,6 +262,74 @@ private void showAdvice(String titulo, String mensaje) {
         content = scroll;
     }
      JOptionPane.showMessageDialog(ventana, content, titulo, JOptionPane.WARNING_MESSAGE);
+}
+private File chooseFile(String titulo) {
+    javax.swing.JFileChooser fc = new javax.swing.JFileChooser();
+    fc.setDialogTitle(titulo);
+    File datos = new File("datos");
+    if (datos.isDirectory()) {
+        fc.setCurrentDirectory(datos);
+    }
+    fc.setFileFilter(new javax.swing.filechooser.FileNameExtensionFilter(
+            "Archivos CSV (*.csv)", "csv"));
+    if (fc.showOpenDialog(ventana) == javax.swing.JFileChooser.APPROVE_OPTION) {
+        return fc.getSelectedFile();
+    }
+    return null;
+}
+
+private File chooseSaveFile(String titulo) {
+    javax.swing.JFileChooser fc = new javax.swing.JFileChooser();
+    fc.setDialogTitle(titulo);
+    File datos = new File("datos");
+    if (datos.isDirectory()) {
+        fc.setCurrentDirectory(datos);
+    }
+    fc.setFileFilter(new javax.swing.filechooser.FileNameExtensionFilter(
+            "Archivos CSV (*.csv)", "csv"));
+    if (fc.showSaveDialog(ventana) != javax.swing.JFileChooser.APPROVE_OPTION) {
+        return null;
+    }
+    File f = fc.getSelectedFile();
+    if (!f.getName().toLowerCase().endsWith(".csv")) {
+        f = new File(f.getParentFile(), f.getName() + ".csv");
+    }
+    if (f.exists()) {
+        int r = JOptionPane.showConfirmDialog(ventana,
+                "El archivo " + f.getName() + " ya existe. ¿Desea reemplazarlo?",
+                "Reemplazar archivo",
+                JOptionPane.YES_NO_OPTION,
+                JOptionPane.WARNING_MESSAGE);
+        if (r != JOptionPane.YES_OPTION) {
+            return null;
+        }
+    }
+    return f;
+}
+
+private void loadFrom(File estaciones, File conexiones) {
+    Grafo nuevo = new Grafo();
+    gestor.reiniciarResultados();
+    try {
+        gestor.cargarEstaciones(estaciones, nuevo);
+        gestor.cargarConexiones(conexiones, nuevo);
+    } catch (java.io.IOException | RuntimeException ex) {
+        showError("No se pudo leer el archivo", ex.getMessage());
+        return;
+    }
+
+    grafo = nuevo;
+    analisis = new AnalisisRed(grafo);
+    archivoEstaciones = estaciones;
+    archivoConexiones = conexiones;
+    cambiosSinGuardar = false;
+    areaResults.setText("");
+    refresh();
+
+    if (gestor.getLineasConError() > 0) {
+        showAdvice("Se ignoraron " + gestor.getLineasConError() + " línea(s) inválida(s)",
+                gestor.getErrores());
+    }
 }
 
     private void refresh() {
