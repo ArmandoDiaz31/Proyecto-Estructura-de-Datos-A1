@@ -15,7 +15,6 @@ import TDA.Nodo;
 
 public class Grafo {
     private static final int CAPACIDAD_INICIAL = 64;
-    private ListaEnlazada<Estacion> Estaciones;
     
     public static class ResultadoRuta{
         private final Estacion[] Camino;
