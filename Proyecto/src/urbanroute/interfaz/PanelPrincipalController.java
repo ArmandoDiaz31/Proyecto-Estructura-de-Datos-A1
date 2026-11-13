@@ -93,6 +93,10 @@ public class PanelPrincipalController {
         connectEvents();
         loadOrigin();
         refresh();
+        btRuta.setToolTipText("Calcula el trayecto de menor tiempo entre origen y destino");
+        btSubredes.setToolTipText("Muestra los grupos de estaciones conectadas entre sí");
+        btHubs.setToolTipText("Resalta las estaciones con más conexiones");
+        btClear.setToolTipText("Quita los colores y vacía los resultados");
     }
 
     private void connectEvents(){
