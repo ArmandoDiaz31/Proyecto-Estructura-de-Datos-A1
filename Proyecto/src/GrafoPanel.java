@@ -7,6 +7,11 @@
  *
  * @author josea
  */
+
+
+import urbanroute.modelo.Estacion;
+import urbanroute.modelo.Grafo;
+
 public class GrafoPanel extends javax.swing.JPanel {
  
    private org.graphstream.graph.Graph visual;
@@ -31,12 +36,7 @@ public GrafoPanel() {
  
     visual = new org.graphstream.graph.implementations.SingleGraph("UrbanRoute");
     
-    visual.setAttribute("ui.stylesheet",
-    "node { fill-color: #2E86C1; size: 22px; text-size: 14; text-alignment: above; text-color: #1B2631; }"
-  + "edge { fill-color: #7F8C8D; size: 2px; }"
-  + "node.ruta { fill-color: #E74C3C; size: 26px; }"
-  + "edge.ruta { fill-color: #E74C3C; size: 4px; }"
-  + "node.hub { fill-color: #F39C12; size: 28px; }");
+   visual.setAttribute("ui.stylesheet", style);
  
     org.graphstream.ui.swing_viewer.SwingViewer visor =
         new org.graphstream.ui.swing_viewer.SwingViewer(visual,
@@ -77,11 +77,39 @@ public void marcarArista(String id, String clase) {
     }
 }
 
+private static final String style =
+      "node { fill-color: #2E86C1; size: 22px; text-size: 14; text-alignment: above; text-color: #1B2631; }"
+    + "edge { fill-color: #7F8C8D; size: 2px; }"
+    + "node.ruta { fill-color: #E74C3C; size: 26px; }"
+    + "edge.ruta { fill-color: #E74C3C; size: 4px; }"
+    + "node.hub { fill-color: #F39C12; size: 28px; }";
+
 public void clearMarcar() {
     visual.nodes().forEach(n -> n.removeAttribute("ui.class"));
     visual.edges().forEach(e -> e.removeAttribute("ui.class"));
 }
 
+public void draw(Grafo g) {
+    visual.clear();
+    visual.setAttribute("ui.stylesheet", style);
+    int n = g.getCantidadEstaciones();
+ 
+    for (int i = 0; i < n; i++) {
+        Estacion e = g.ObtenerEstacionPorIndice(i);
+        org.graphstream.graph.Node nodo = visual.addNode( e.getId() );       
+        nodo.setAttribute("ui.label", e.getId());                            
+    }
+
+    for (int i = 0; i < n; i++) {
+        for (int j = i + 1; j < n; j++) {
+            int weight = g.getDuracion(i, j);
+            if (weight > 0) {
+                org.graphstream.graph.Edge arista = visual.addEdge( i + "-" + j, g.ObtenerEstacionPorIndice(i).getId(), g.ObtenerEstacionPorIndice(j).getId() );
+                arista.setAttribute("ui.label", weight);
+            }
+        }
+    }
+}
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
