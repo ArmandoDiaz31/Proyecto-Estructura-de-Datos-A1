@@ -1,4 +1,6 @@
-package urbanroute.modelo;
+package TDA;
+
+import urbanroute.modelo.Estacion;
 
 public class TablaHash {
     private static final int CAPACIDAD_INICIAL = 31;

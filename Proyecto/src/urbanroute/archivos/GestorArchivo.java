@@ -12,7 +12,7 @@ import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
 import java.text.Normalizer;
 import urbanroute.modelo.Estacion;
-import urbanroute.modelo.Grafo;
+import TDA.Grafo;
 
 public class GestorArchivo {
     private static final String CABECERA_ESTACIONES =

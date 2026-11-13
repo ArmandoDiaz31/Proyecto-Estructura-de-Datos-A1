@@ -1,3 +1,5 @@
+package urbanroute.interfaz;
+
 /*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JPanel.java to edit this template
@@ -10,7 +12,7 @@
 
 
 import urbanroute.modelo.Estacion;
-import urbanroute.modelo.Grafo;
+import TDA.Grafo;
 
 public class GrafoPanel extends javax.swing.JPanel {
  

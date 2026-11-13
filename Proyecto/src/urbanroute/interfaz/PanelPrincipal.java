@@ -1,3 +1,5 @@
+package urbanroute.interfaz;
+
 /*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
@@ -8,13 +10,14 @@
  * @author josea
  */
 
+import urbanroute.interfaz.GrafoPanel;
 import javax.swing.JOptionPane;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
 import urbanroute.archivos.GestorArchivo;
 import urbanroute.modelo.Estacion;
-import urbanroute.modelo.Grafo;
+import TDA.Grafo;
 
 
 public class PanelPrincipal extends javax.swing.JFrame {
