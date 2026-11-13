@@ -9,23 +9,42 @@
  */
 
 import javax.swing.JOptionPane;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.io.File;
+import urbanroute.archivos.GestorArchivo;
+import urbanroute.modelo.Estacion;
+import urbanroute.modelo.Grafo;
+
 
 public class PanelPrincipal extends javax.swing.JFrame {
+    private Grafo grafo;
+    private GestorArchivo gestor;
+    private File archivoEstaciones;
+    private File archivoConexiones;
+    private boolean cambiosSinGuardar;
     
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(PanelPrincipal.class.getName());
 
     /**
      * Creates new form PanelPrincipal
      */
+    
+    
     public PanelPrincipal() {
         initComponents();
+         grafo = new Grafo();
+        gestor = new GestorArchivo();
         conectarEventos();
+        cargarMaestroInicial();
+        refresh();
+        
     }
     private void conectarEventos(){
     //Menú Archivo
     itemUpload.addActionListener(e -> accionCargar());
     itemSave.addActionListener(e -> accionGuardar());
-    itemExit.addActionListener(e -> confirmarSalida());
+    itemExit.addActionListener(e -> confirmSalida());
     
     //Menú Red
     itemAddStation.addActionListener(e -> accionAgregarEstacion());
@@ -45,6 +64,14 @@ public class PanelPrincipal extends javax.swing.JFrame {
     btSubredes.addActionListener (e -> accionSubredes());
     btHubs.addActionListener (e -> accionHubs());
     btClear.addActionListener (e -> accionLimpiar());
+    
+    addWindowListener(new WindowAdapter() {
+    @Override
+    public void windowClosing(WindowEvent e) {
+        confirmSalida();
+    }
+});
+    
     }
     
     private void aviso(String mensaje) {
@@ -59,8 +86,9 @@ public class PanelPrincipal extends javax.swing.JFrame {
     aviso("Guardar cambios(Pendiente)");
     }
     
-    private void confirmarSalida(){
-    aviso("Salir (Pendiente)");
+    private void confirmSalida(){
+    dispose();
+    System.exit(0);
     }
     
     private void accionAgregarEstacion(){
@@ -92,8 +120,40 @@ public class PanelPrincipal extends javax.swing.JFrame {
     }
     
     private void accionLimpiar(){
-    areaResults.setText("");
+        areaResults.setText("");
+        grafoPanel1.clearMarcar();
+    
     }
+    private void llenarCombos() {
+    cbOrigen.removeAllItems();
+    cbDestino.removeAllItems();
+    for (int i = 0; i < grafo.getCantidadEstaciones() ; i++) {                    
+        Estacion e = grafo.ObtenerEstacionPorIndice(i);
+        cbOrigen.addItem( e );
+        cbDestino.addItem( e);
+    }
+}
+    
+    private void cargarMaestroInicial() {
+    }
+
+    private void refresh() {
+        grafoPanel1.draw(grafo);            
+        llenarCombos();                        
+        boolean hayRed = grafo.getCantidadEstaciones() > 0 ;                  
+        btRuta.setEnabled(hayRed);
+        btSubredes.setEnabled(hayRed);
+        btHubs.setEnabled(hayRed);
+        labelState.setText(grafo.getCantidadEstaciones() + " estaciones | "
+        + grafo.getCantidadConexiones() + " conexiones"
+        + (cambiosSinGuardar ? " | cambios sin guardar" : ""));   
+    }
+    
+    private void saveChange() {
+    cambiosSinGuardar = true;
+    refresh();
+    }
+    
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -116,6 +176,7 @@ public class PanelPrincipal extends javax.swing.JFrame {
         jScrollPane2 = new javax.swing.JScrollPane();
         areaResults = new javax.swing.JTextArea();
         labelState = new javax.swing.JLabel();
+        grafoPanel1 = new GrafoPanel();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
         itemUpload = new javax.swing.JMenuItem();
@@ -233,18 +294,24 @@ public class PanelPrincipal extends javax.swing.JFrame {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addGap(0, 465, Short.MAX_VALUE)
-                        .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(grafoPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 459, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(16, 16, 16)
+                        .addComponent(grafoPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
@@ -300,8 +367,9 @@ public class PanelPrincipal extends javax.swing.JFrame {
     private javax.swing.JButton btHubs;
     private javax.swing.JButton btRuta;
     private javax.swing.JButton btSubredes;
-    private javax.swing.JComboBox<String> cbDestino;
-    private javax.swing.JComboBox<String> cbOrigen;
+    private javax.swing.JComboBox<Estacion> cbDestino;
+    private javax.swing.JComboBox<Estacion> cbOrigen;
+    private GrafoPanel grafoPanel1;
     private javax.swing.JMenuItem itemAddConection;
     private javax.swing.JMenuItem itemAddStation;
     private javax.swing.JMenuItem itemDeleteStation;
