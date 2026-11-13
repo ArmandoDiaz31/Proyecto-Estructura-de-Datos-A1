@@ -430,9 +430,34 @@ public class PanelPrincipalController {
     grafoPanel1.resaltHubs(hubs);
     }
     
-    private void actionHelp(){
-    advise("Ayuda (Pendiente)");
-    }
+    private void actionHelp() {
+    String texto =
+        """
+        Cargar archivos:
+          Archivo > Cargar Archivos. Elija primero el CSV de estaciones y luego el de conexiones.
+        
+        Agregar o eliminar (men\u00fa Red):
+          Agregar Estaci\u00f3n: ID, nombre, l\u00ednea, zona y capacidad (sin comas).
+          Agregar Conexi\u00f3n: elija origen y destino y escriba el tiempo en minutos.
+          Eliminar Estaci\u00f3n: tambi\u00e9n elimina sus conexiones.
+        
+        An\u00e1lisis (men\u00fa An\u00e1lisis o botones del panel):
+          Subredes: muestra los grupos de estaciones conectadas entre s\u00ed.
+          Ruta m\u00e1s corta: calcula el trayecto de menor tiempo entre origen y destino.
+          Hubs de transferencia: resalta las estaciones con m\u00e1s conexiones.
+        
+        Colores:
+          Rojo: ruta m\u00e1s corta.
+          Naranja: hubs de transferencia.
+          Un color distinto por cada subred.
+          Limpiar resultado quita los colores y vac\u00eda el texto.
+        
+        Guardar:
+          Archivo > Guardar Archivo. Sobrescribe los CSV cargados y avisa antes de hacerlo.
+          Al salir con cambios pendientes se pregunta si desea guardar.""";
+    JOptionPane.showMessageDialog(ventana, texto, "Cómo usar UrbanRoute",
+            JOptionPane.INFORMATION_MESSAGE);
+}
     
     private void actionClear(){
         areaResults.setText("");
