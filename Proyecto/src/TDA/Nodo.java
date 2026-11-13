@@ -16,4 +16,20 @@ public class Nodo <T> {
         this.info = elem;
         this.pNext = null;
     }
+    
+    public T getInfo(){
+        return info;
+    }
+    
+    public void setInfo(T info){
+        this.info = info;
+    }
+    
+    public Nodo <T> getSiguiente(){
+        return pNext;
+    }
+    
+    public void setSiguiente(Nodo <T> siguiente){
+        this.pNext = siguiente;
+    }
 }
