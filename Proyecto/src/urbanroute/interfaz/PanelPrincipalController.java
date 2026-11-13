@@ -159,53 +159,188 @@ public class PanelPrincipalController {
     loadFrom(est, con);
 }
     
-    private boolean actionSave(){
-     File est = archivoEstaciones;
-        File con = archivoConexiones;
- 
-        
-        if (est == null || con == null) {
-            est = chooseSaveFile("Guardar ESTACIONES como...");
-            if (est == null) {
-                return false;
-            }
-            con = chooseSaveFile("Guardar CONEXIONES como...");
-            if (con == null) {
-                return false;
-            }
-        }
- 
-        try {
-            gestor.guardarEstaciones(grafo, est);
-            gestor.guardarConexiones(grafo, con);
-        } catch (java.io.IOException | RuntimeException ex) {
-            showError("No se pudo guardar", ex.getMessage());
+    private boolean actionSave() {
+    File est = archivoEstaciones;
+    File con = archivoConexiones;
+
+    if (est == null || con == null) {
+        est = chooseSaveFile("Guardar estaciones como...");
+        if (est == null) {
             return false;
-    }
-          archivoEstaciones = est;
-        archivoConexiones = con;
-        cambiosSinGuardar = false;
-        refresh();
-        return true;
+        }
+        con = chooseSaveFile("Guardar conexiones como...");
+        if (con == null) {
+            return false;
+        }
+    } else {
+        int r = JOptionPane.showConfirmDialog(ventana,
+                "Se sobrescribirán " + est.getName() + " y " + con.getName() + ". Continuar?",
+                "Guardar cambios",
+                JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+        if (r != JOptionPane.YES_OPTION) {
+            return false;
+        }
     }
 
+    try {
+        gestor.guardarEstaciones(grafo, est);
+        gestor.guardarConexiones(grafo, con);
+    } catch (java.io.IOException | RuntimeException ex) {
+        showError("No se pudo guardar", ex.getMessage());
+        return false;
+    }
+
+    archivoEstaciones = est;
+    archivoConexiones = con;
+    cambiosSinGuardar = false;
+    refresh();
+    return true;
+}
+
     
-    private void confirmExit(){
+    private void confirmExit() {
+    if (cambiosSinGuardar) {
+        int r = JOptionPane.showConfirmDialog(ventana,
+                "Hay cambios sin guardar. ¿Desea guardarlos antes de salir?",
+                "Cambios sin guardar",
+                JOptionPane.YES_NO_CANCEL_OPTION,
+                JOptionPane.WARNING_MESSAGE);
+        if (r == JOptionPane.CANCEL_OPTION || r == JOptionPane.CLOSED_OPTION) {
+            return;
+        }
+        if (r == JOptionPane.YES_OPTION && !actionSave()) {
+            return;
+        }
+        // Si responde No, sale sin guardar
+    }
     ventana.dispose();
     System.exit(0);
-    }
+}
     
-    private void actionAddStation(){
-    advise("Agregar estacion(Pendiente)");
+   private void actionAddStation() {
+    javax.swing.JTextField txtId = new javax.swing.JTextField();
+    javax.swing.JTextField txtNombre = new javax.swing.JTextField();
+    javax.swing.JTextField txtLinea = new javax.swing.JTextField();
+    javax.swing.JTextField txtZona = new javax.swing.JTextField();
+    javax.swing.JTextField txtCap = new javax.swing.JTextField();
+
+    Object[] campos = {
+        "ID:", txtId,
+        "Nombre:", txtNombre,
+        "Línea:", txtLinea,
+        "Zona:", txtZona,
+        "Capacidad:", txtCap
+    };
+    int r = JOptionPane.showConfirmDialog(ventana, campos, "Agregar estación",
+            JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+    if (r != JOptionPane.OK_OPTION) {
+        return;
     }
+
+    String id = txtId.getText().trim();
+    String nombre = txtNombre.getText().trim();
+    String linea = txtLinea.getText().trim();
+    String zona = txtZona.getText().trim();
+
+    if (id.isEmpty()) {
+        showError("Dato inválido", "El ID no puede estar vacío.");
+        return;
+    }
+   
+    if (id.contains(",") || nombre.contains(",") || linea.contains(",") || zona.contains(",")) {
+        showError("Dato inválido", "Los campos no pueden contener comas.");
+        return;
+    }
+
+    int cap;
+    try {
+        cap = Integer.parseInt(txtCap.getText().trim());
+    } catch (NumberFormatException ex) {
+        showError("Dato inválido", "La capacidad debe ser un número entero");
+        return;
+    }
+
+    try {
+        grafo.AgregarEstacion(new Estacion(id, nombre, linea, zona, cap));
+    } catch (IllegalArgumentException ex) {
+        showError("No se pudo agregar", ex.getMessage());
+        return;
+    }
+    saveChange();
+}
     
-    private void actionAddConnection(){
-    advise("Agregar conexion(Pendiente)");
+    private void actionAddConnection() {
+    if (grafo.getCantidadEstaciones() < 2) {
+        showAdvice("Aviso", "Se necesitan al menos 2 estaciones para crear una conexión.");
+        return;
     }
+
+    javax.swing.JComboBox<Estacion> cbO =
+            new javax.swing.JComboBox<>(grafo.ObtenerTodasLasEstaciones());
+    javax.swing.JComboBox<Estacion> cbD =
+            new javax.swing.JComboBox<>(grafo.ObtenerTodasLasEstaciones());
+    javax.swing.JTextField txtTiempo = new javax.swing.JTextField();
+
+    Object[] campos = {
+        "Origen:", cbO,
+        "Destino:", cbD,
+        "Tiempo (minutos):", txtTiempo
+    };
+    int r = JOptionPane.showConfirmDialog(ventana, campos, "Agregar conexión",
+            JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+    if (r != JOptionPane.OK_OPTION) {
+        return;
+    }
+
+    Estacion o = (Estacion) cbO.getSelectedItem();
+    Estacion d = (Estacion) cbD.getSelectedItem();
+
+    int tiempo;
+    try {
+        tiempo = Integer.parseInt(txtTiempo.getText().trim());
+    } catch (NumberFormatException ex) {
+        showError("Dato inválido", "El tiempo debe ser un número entero");
+        return;
+    }
+
+    try {
+        grafo.AgregarConexion(o.getId(), d.getId(), tiempo);
+    } catch (IllegalArgumentException ex) {
+        showError("No se pudo agregar", ex.getMessage());
+        return;
+    }
+    saveChange();
+}
+
     
-    private void actionDeleteStation(){
-    advise("Eliminar estacion(Pendiente)");
+    private void actionDeleteStation() {
+    if (grafo.getCantidadEstaciones() == 0) {
+        showAdvice("Aviso", "No hay estaciones para eliminar.");
+        return;
     }
+
+    javax.swing.JComboBox<Estacion> cb =
+            new javax.swing.JComboBox<>(grafo.ObtenerTodasLasEstaciones());
+    Object[] campos = { "Estación a eliminar:", cb };
+    int r = JOptionPane.showConfirmDialog(ventana, campos, "Eliminar estación",
+            JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+    if (r != JOptionPane.OK_OPTION) {
+        return;
+    }
+
+    Estacion e = (Estacion) cb.getSelectedItem();
+    int n = grafo.ObtenerGrado(e.getId());
+    int c = JOptionPane.showConfirmDialog(ventana,
+            "Se eliminará " + e.getNombre() + " y sus " + n + " conexiones. ¿Continuar?",
+            "Confirmar eliminación",
+            JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+    if (c != JOptionPane.YES_OPTION) {
+        return;
+    }
+
+    grafo.EliminarEstacion(e.getId());
+    saveChange();
+}
     
     private void actionSubnets(){
       Estacion[][] subredes = analisis.DetectarSubredes();
@@ -244,7 +379,7 @@ public class PanelPrincipalController {
         return;
     }
 
-    grafoPanel1.highlightRoute(r);
+    grafoPanel1.resaltRuta(r);
 
     Estacion[] camino = r.getCamino();
     StringBuilder sb = new StringBuilder();
@@ -288,7 +423,7 @@ public class PanelPrincipalController {
     }
 
     areaResults.setText("Hubs de transferencia (grado " + max + "): " + nombres);
-    grafoPanel1.highlightHubs(hubs);
+    grafoPanel1.resaltHubs(hubs);
     }
     
     private void actionHelp(){
