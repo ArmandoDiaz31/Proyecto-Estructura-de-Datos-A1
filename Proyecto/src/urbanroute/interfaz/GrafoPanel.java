@@ -13,6 +13,7 @@ package urbanroute.interfaz;
 
 import urbanroute.modelo.Estacion;
 import TDA.Grafo;
+import urbanroute.modelo.ResultadoRuta;
 
 public class GrafoPanel extends javax.swing.JPanel {
  
@@ -52,17 +53,14 @@ public GrafoPanel() {
 }
 private static final String[] colors = {"#E74C3C", "#3498DB", "#2ECC71", "#F39C12", "#9B59B6", "#1ABC9C"};
 
-private String[] id_indice = new String[0];
-
-public void colorSubredes(int[] subred) {
-    for (int i = 0; i < subred.length; i++) {
-        if (i >= id_indice.length) { 
-            break; 
-        }
-        String color = colors[subred[i] % colors.length];
-        org.graphstream.graph.Node n = visual.getNode(id_indice[i]);
-        if (n != null) {
-            n.setAttribute("ui.style", "fill-color: " + color + ";");
+public void colorSubredes(Estacion[][] subredes) {
+    for (int i = 0; i < subredes.length; i++) {
+        String color = colors[i % colors.length];
+        for (Estacion e : subredes[i]) {
+            org.graphstream.graph.Node n = visual.getNode(e.getId());
+            if (n != null) {
+                n.setAttribute("ui.style", "fill-color: " + color + ";");
+            }
         }
     }
 }
@@ -88,7 +86,28 @@ private static final String style =
 
 public void clearMarcar() {
     visual.nodes().forEach(n -> n.removeAttribute("ui.class"));
+    visual.nodes().forEach(n -> n.removeAttribute("ui.style"));
     visual.edges().forEach(e -> e.removeAttribute("ui.class"));
+}
+
+public void resaltHubs(Estacion[] hubs) {
+    clearMarcar();
+    for (Estacion h : hubs) {
+        marcarNodo(h.getId(), "hub");
+    }
+}
+
+public void resaltRuta(ResultadoRuta r) {
+    clearMarcar();
+    Estacion[] camino = r.getCamino();
+    for (int k = 0; k < camino.length; k++) {
+        marcarNodo(camino[k].getId(), "ruta");
+        if (k < camino.length - 1) {
+            int a = camino[k].getIndice();
+            int b = camino[k + 1].getIndice();
+            marcarArista(Math.min(a, b) + "-" + Math.max(a, b), "ruta");
+        }
+    }
 }
 
 public void draw(Grafo g) {
