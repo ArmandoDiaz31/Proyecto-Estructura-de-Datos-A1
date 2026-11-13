@@ -211,7 +211,33 @@ public class PanelPrincipalController {
 }
     
     private void loadOrigin() {
+    File est = gestor.getArchivoEstacionesMaestro();
+    File con = gestor.getArchivoConexionesMaestro();
+    if (!est.exists() || !con.exists()) {
+        showAdvice("No se encontró el archivo maestro; use Archivo > Cargar");
+        return;
     }
+    loadFrom(est, con);
+}
+    private void showError(String titulo, String mensaje) {
+    JOptionPane.showMessageDialog(ventana, mensaje, titulo, JOptionPane.ERROR_MESSAGE);
+}
+
+private void showAdvice(String mensaje) {
+    JOptionPane.showMessageDialog(ventana, mensaje, "Aviso", JOptionPane.WARNING_MESSAGE);
+}
+
+private void showAdvice(String titulo, String mensaje) {
+    Object content = mensaje;
+    if (mensaje != null && mensaje.length() > 200) {
+        javax.swing.JTextArea texto = new javax.swing.JTextArea(mensaje);
+        texto.setEditable(false);
+        javax.swing.JScrollPane scroll = new javax.swing.JScrollPane(texto);
+        scroll.setPreferredSize(new java.awt.Dimension(520, 260));
+        content = scroll;
+    }
+     JOptionPane.showMessageDialog(ventana, content, titulo, JOptionPane.WARNING_MESSAGE);
+}
 
     private void refresh() {
         grafoPanel1.draw(grafo);            
