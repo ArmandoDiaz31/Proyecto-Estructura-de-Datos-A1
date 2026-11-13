@@ -8,6 +8,7 @@ import urbanroute.archivos.GestorArchivo;
 import urbanroute.modelo.Estacion;
 import TDA.Grafo;
 import urbanroute.modelo.AnalisisRed;
+import urbanroute.modelo.ResultadoRuta;
 
 /**
  *
@@ -207,15 +208,87 @@ public class PanelPrincipalController {
     }
     
     private void actionSubnets(){
-    areaResults.setText("Subredes (Pendiente)");
+      Estacion[][] subredes = analisis.DetectarSubredes();
+    StringBuilder sb = new StringBuilder("Subredes encontradas: " + subredes.length + "\n");
+    for (int s = 0; s < subredes.length; s++) {
+        sb.append("Subred ").append(s + 1).append(": ");
+        for (Estacion e : subredes[s]) {
+            sb.append(e.getId()).append(" ");
+        }
+        sb.append("\n");
+    }
+    areaResults.setText(sb.toString());
+    grafoPanel1.clearMarcar();
+    grafoPanel1.colorSubredes(subredes);
     }
     
     private void actionRoute(){
-    areaResults.setText("Ruta mas corta (Pendiente)");
+     Estacion o = (Estacion) cbOrigen.getSelectedItem();
+    Estacion d = (Estacion) cbDestino.getSelectedItem();
+    if (o == null || d == null) {
+        showAdvice("Aviso", "Seleccione una estación de origen y una de destino.");
+        return;
+    }
+
+    ResultadoRuta r;
+    try {
+        r = analisis.CalcularRutaMasCorta(o.getId(), d.getId());
+    } catch (IllegalArgumentException ex) {
+        showError("No se pudo calcular la ruta", ex.getMessage());
+        return;
+    }
+
+    if (!r.esExisteRuta()) {
+        areaResults.setText("No existe ruta entre " + o.getNombre() + " y " + d.getNombre());
+        grafoPanel1.clearMarcar();
+        return;
+    }
+
+    grafoPanel1.highlightRoute(r);
+
+    Estacion[] camino = r.getCamino();
+    StringBuilder sb = new StringBuilder();
+    sb.append("Ruta más corta: ").append(r.getTiempoTotal()).append(" min\n");
+    for (int k = 0; k < camino.length; k++) {
+        sb.append(camino[k].getNombre());
+        if (k < camino.length - 1) {
+            sb.append(" -> ");
+        }
+    }
+    areaResults.setText(sb.toString());
     }
     
     private void actionHubs(){
-    areaResults.setText("Hubs (Pendiente)");
+     Estacion[] ranking = analisis.IdentificarHubs();
+    if (ranking.length == 0) {
+        showAdvice("Aviso", "No hay estaciones cargadas.");
+        return;
+    }
+
+    int max = grafo.ObtenerGrado(ranking[0].getId());
+    if (max == 0) {
+        showAdvice("Aviso", "No hay conexiones, por lo que no hay hubs.");
+        return;
+    }
+
+    // El ranking viene de mayor a menor grado: los empates quedan al principio
+    int cuenta = 0;
+    while (cuenta < ranking.length
+            && grafo.ObtenerGrado(ranking[cuenta].getId()) == max) {
+        cuenta++;
+    }
+    Estacion[] hubs = new Estacion[cuenta];
+    StringBuilder nombres = new StringBuilder();
+    for (int i = 0; i < cuenta; i++) {
+        hubs[i] = ranking[i];
+        nombres.append(ranking[i].getNombre());
+        if (i < cuenta - 1) {
+            nombres.append(", ");
+        }
+    }
+
+    areaResults.setText("Hubs de transferencia (grado " + max + "): " + nombres);
+    grafoPanel1.highlightHubs(hubs);
     }
     
     private void actionHelp(){
