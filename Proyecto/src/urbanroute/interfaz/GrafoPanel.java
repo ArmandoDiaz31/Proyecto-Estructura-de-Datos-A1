@@ -11,14 +11,26 @@ import urbanroute.modelo.Estacion;
 import TDA.Grafo;
 import urbanroute.modelo.ResultadoRuta;
 
+
+
+/**
+ * Panel que dibuja la red con GraphStream. Permite colorear las subredes y
+ * resaltar la ruta más corta y los hubs de transferencia.
+ *
+ * @author José Palomo
+ */
 public class GrafoPanel extends javax.swing.JPanel {
- 
+    /** Grafo de GraphStream con los nodos y aristas que se dibujan. */
    private org.graphstream.graph.Graph visual;
+    /** Componente de GraphStream donde se muestra el grafo. */
    private org.graphstream.ui.swing_viewer.ViewPanel vista;
  
-    // PanelPrincipal vuelve a asignar un BorderLayout a este panel despues de
-    // crearlo, y eso hace que el layout nuevo no conozca la vista. Se vuelve a
-    // agregar en CENTER para que se dibuje.
+    /**
+     * Asigna el layout y, si es BorderLayout, vuelve a agregar la vista en el centro
+     * para que se dibuje.
+     *
+     * @param mgr nuevo administrador de diseño
+     */
     @Override
     public void setLayout(java.awt.LayoutManager mgr) {
         super.setLayout(mgr);
@@ -28,7 +40,7 @@ public class GrafoPanel extends javax.swing.JPanel {
     }
         
     
- 
+   /** Crea el panel, configura GraphStream con el estilo de la red y agrega la vista. */ 
 public GrafoPanel() {
     initComponents();
  
@@ -49,8 +61,15 @@ public GrafoPanel() {
     
 
 }
+  /** Cantidad de colores de subred definidos en la hoja de estilos (sub0 a sub5). */
 private static final String[] colors = {"#E74C3C", "#3498DB", "#2ECC71", "#F39C12", "#9B59B6", "#1ABC9C"};
 
+/**
+     * Colorea cada subred asignando a sus nodos la clase sub0, sub1, etc.
+     * Los colores se repiten si hay más de seis subredes.
+     *
+     * @param subredes estaciones agrupadas por subred
+     */
 public void colorSubredes(Estacion[][] subredes) {
     for (int i = 0; i < subredes.length; i++) {
         for (Estacion e : subredes[i]) {
@@ -62,18 +81,30 @@ public void colorSubredes(Estacion[][] subredes) {
     }
 }
 
+    /**
+     * Asigna una clase de estilo a un nodo, si existe.
+     *
+     * @param id identificador de la estación
+     * @param clase nombre de la clase de estilo (por ejemplo ruta o hub)
+     */
 public void marcarNodo(String id, String clase) {
     if (visual.getNode(id) != null) {
         visual.getNode(id).setAttribute("ui.class", clase);
     }
 }
 
+    /**
+     * Asigna una clase de estilo a una arista, si existe.
+     *
+     * @param id identificador de la arista (menor-mayor, por índices)
+     * @param clase nombre de la clase de estilo
+     */
 public void marcarArista(String id, String clase) {
     if (visual.getEdge(id) != null) {
         visual.getEdge(id).setAttribute("ui.class", clase);
     }
 }
-
+/** Hoja de estilos del grafo: nodos, aristas y las clases ruta, hub y sub0 a sub5. */
 private static final String style =
       "node { fill-color: #2E86C1; size: 22px; text-size: 14; text-alignment: above; text-color: #1B2631; }"
     + "edge { fill-color: #7F8C8D; size: 2px; }"
@@ -87,11 +118,17 @@ private static final String style =
     + "node.sub4 { fill-color: #E84393; }"
     + "node.sub5 { fill-color: #A0522D; }";
 
+ /** Quita las clases de estilo de todos los nodos y aristas. */
 public void clearMarcar() {
     visual.nodes().forEach(n -> n.removeAttribute("ui.class"));
     visual.edges().forEach(e -> e.removeAttribute("ui.class"));
 }
 
+ /**
+     * Resalta las estaciones hub.
+     *
+     * @param hubs estaciones con más conexiones
+     */
 public void resaltHubs(Estacion[] hubs) {
     clearMarcar();
     for (Estacion h : hubs) {
@@ -99,6 +136,11 @@ public void resaltHubs(Estacion[] hubs) {
     }
 }
 
+ /**
+     * Resalta las estaciones y los tramos de una ruta.
+     *
+     * @param r resultado del cálculo de la ruta
+     */
 public void resaltRuta(ResultadoRuta r) {
     clearMarcar();
     Estacion[] camino = r.getCamino();
@@ -112,6 +154,12 @@ public void resaltRuta(ResultadoRuta r) {
     }
 }
 
+/**
+     * Redibuja la red completa: una estación por nodo y una arista por conexión,
+     * con el tiempo como etiqueta.
+     *
+     * @param g red a dibujar
+     */
 public void draw(Grafo g) {
     visual.clear();
     visual.setAttribute("ui.stylesheet", style);

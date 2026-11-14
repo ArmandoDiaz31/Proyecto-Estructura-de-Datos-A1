@@ -15,16 +15,16 @@ import urbanroute.modelo.Estacion;
  */
 
 public class PanelPrincipal extends javax.swing.JFrame {
+    
+       /** Controlador que maneja las acciones de esta ventana. */
     private PanelPrincipalController controlador;
     
+     /** Registro de errores de la ventana. */
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(PanelPrincipal.class.getName());
 
-    /**
-     * Creates new form PanelPrincipal
-     */
-        
-    
-    
+   /**
+     * Crea la ventana, construye sus componentes y conecta el controlador.
+     */ 
     public PanelPrincipal() {
         initComponents();
         controlador = new PanelPrincipalController(this,
@@ -35,6 +35,7 @@ public class PanelPrincipal extends javax.swing.JFrame {
                 itemSubNets, itemRoute, itemHubs, itemHelp);
         controlador.start();
     }
+    
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -196,7 +197,7 @@ public class PanelPrincipal extends javax.swing.JFrame {
     private void cbOrigenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbOrigenActionPerformed
        
     }//GEN-LAST:event_cbOrigenActionPerformed
-
+ 
     private void itemUploadActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_itemUploadActionPerformed
      
     }//GEN-LAST:event_itemUploadActionPerformed
@@ -210,7 +211,9 @@ public class PanelPrincipal extends javax.swing.JFrame {
     }//GEN-LAST:event_itemAddConectionActionPerformed
 
     /**
-     * @param args the command line arguments
+     * Punto de entrada del programa. Aplica el aspecto Nimbus y muestra la ventana principal.
+     *
+     * @param args argumentos de la línea de comandos (no se usan)
      */
     public static void main(String args[]) {
         /* Set the Nimbus look and feel */

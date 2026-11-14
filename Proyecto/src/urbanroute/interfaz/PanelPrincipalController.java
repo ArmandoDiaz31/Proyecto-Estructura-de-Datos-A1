@@ -10,21 +10,39 @@ import TDA.Grafo;
 import urbanroute.modelo.AnalisisRed;
 import urbanroute.modelo.ResultadoRuta;
 
+/**
+ * Controlador de la ventana principal. Conecta los menús y botones de
+ * {@link PanelPrincipal} con el grafo, el análisis de la red y los archivos CSV,
+ * y muestra los resultados en pantalla.
+ *
+ * @author José Palomo
+ */
 
 public class PanelPrincipalController {
+     /** Red de estaciones y conexiones que se muestra actualmente. */
     private Grafo grafo;
+     /** Operaciones de análisis (subredes, ruta más corta, hubs) sobre la red. */
     private AnalisisRed analisis;
+     /** Lee y escribe los archivos CSV. */
     private GestorArchivo gestor;
+     /** Último archivo de estaciones cargado o guardado; null si no hay. */
     private File archivoEstaciones;
+    /** Último archivo de conexiones cargado o guardado; null si no hay. */
     private File archivoConexiones;
+       /** Indica si hay modificaciones que aún no se guardaron en los CSV. */
     private boolean cambiosSinGuardar;
 
-    // Ventana y componentes que vienen de PanelPrincipal
+      /** Ventana principal, usada como padre de los diálogos. */
     private final javax.swing.JFrame ventana;
+      /** Panel que dibuja el grafo. */
     private final GrafoPanel grafoPanel1;
+     /** Selector de la estación de origen. */
     private final javax.swing.JComboBox<Estacion> cbOrigen;
+    /** Selector de la estación de destino. */
     private final javax.swing.JComboBox<Estacion> cbDestino;
+     /** Área donde se escriben los resultados de los análisis. */
     private final javax.swing.JTextArea areaResults;
+     /** Etiqueta con el resumen de la red (estaciones, conexiones y cambios). */
     private final javax.swing.JLabel labelState;
     private final javax.swing.JButton btRuta;
     private final javax.swing.JButton btSubredes;
@@ -40,6 +58,31 @@ public class PanelPrincipalController {
     private final javax.swing.JMenuItem itemRoute;
     private final javax.swing.JMenuItem itemHubs;
     private final javax.swing.JMenuItem itemHelp;
+    
+     /**
+     * Crea el controlador con la ventana y los componentes que va a manejar.
+     *
+     * @param ventana ventana principal
+     * @param grafoPanel1 panel que dibuja el grafo
+     * @param cbOrigen selector de origen
+     * @param cbDestino selector de destino
+     * @param areaResults área de resultados
+     * @param labelState etiqueta de estado
+     * @param btRuta botón de ruta más corta
+     * @param btSubredes botón de subredes
+     * @param btHubs botón de hubs
+     * @param btClear botón de limpiar resultado
+     * @param itemUpload menú Cargar Archivos
+     * @param itemSave menú Guardar Archivo
+     * @param itemExit menú Salir
+     * @param itemAddStation menú Agregar Estación
+     * @param itemAddConection menú Agregar Conexión
+     * @param itemDeleteStation menú Eliminar Estación
+     * @param itemSubNets menú Subredes
+     * @param itemRoute menú Ruta más Corta
+     * @param itemHubs menú Hubs de transferencia
+     * @param itemHelp menú Cómo usar
+     */
 
     public PanelPrincipalController(javax.swing.JFrame ventana,
             GrafoPanel grafoPanel1,
@@ -83,7 +126,10 @@ public class PanelPrincipalController {
         this.itemHelp = itemHelp;
     }
 
-    
+     /**
+     * Crea la red vacía, conecta los eventos, asigna los tooltips, carga los
+     * archivos maestros y refresca la pantalla.
+     */
     public void start() {
         grafo = new Grafo();
         analisis = new AnalisisRed(grafo);
@@ -96,8 +142,9 @@ public class PanelPrincipalController {
         btHubs.setToolTipText("Resalta las estaciones con más conexiones");
         btClear.setToolTipText("Quita los colores y vacía los resultados");
     }
-
+ /** Asigna a cada menú y botón la acción que debe ejecutar y controla el cierre de la ventana. */
     private void connectEvents(){
+        
     //Menú Archivo
     itemUpload.addActionListener(e -> actionUpload());
     itemSave.addActionListener(e -> actionSave());
@@ -123,6 +170,11 @@ public class PanelPrincipalController {
     btClear.addActionListener (e -> actionClear());
     
     ventana.addWindowListener(new WindowAdapter() {
+         /**
+     * Al cerrar la ventana se confirma la salida.
+     *
+     * @param e evento de cierre
+     */
     @Override
     public void windowClosing(WindowEvent e) {
         confirmExit();
@@ -130,11 +182,19 @@ public class PanelPrincipalController {
 });
     
     }
-    
+     /**
+     * Muestra un mensaje informativo.
+     *
+     * @param mensaje texto a mostrar
+     */
     private void advise(String mensaje) {
     JOptionPane.showMessageDialog(ventana, mensaje);
     }
     
+      /**
+     * Pide los archivos CSV de estaciones y conexiones y carga la red. Si hay cambios
+     * sin guardar, pregunta antes si se desean guardar.
+     */
     private void actionUpload() {
     if (cambiosSinGuardar) {
         int r = JOptionPane.showConfirmDialog(ventana,
@@ -160,7 +220,11 @@ public class PanelPrincipalController {
     }
     loadFrom(est, con);
 }
-    
+     /**
+     * Guarda estaciones y conexiones en archivos CSV, pidiendo confirmación si se van a sobrescribir.
+     *
+     * @return true si se guardó; false si falló o el usuario canceló
+     */
     private boolean actionSave() {
     File est = archivoEstaciones;
     File con = archivoConexiones;
@@ -199,7 +263,7 @@ public class PanelPrincipalController {
     return true;
 }
 
-    
+      /** Cierra el programa. Si hay cambios sin guardar, pregunta si se desea guardar antes de salir. */
     private void confirmExit() {
     if (cambiosSinGuardar) {
         int r = JOptionPane.showConfirmDialog(ventana,
@@ -218,7 +282,7 @@ public class PanelPrincipalController {
     ventana.dispose();
     System.exit(0);
 }
-    
+    /** Pide los datos de una estación, los valida y la agrega a la red. */
    private void actionAddStation() {
     javax.swing.JTextField txtId = new javax.swing.JTextField();
     javax.swing.JTextField txtNombre = new javax.swing.JTextField();
@@ -269,8 +333,9 @@ public class PanelPrincipalController {
         return;
     }
     saveChange();
-}
-    
+}  
+   
+   /** Pide origen, destino y tiempo, y agrega la conexión entre las dos estaciones. */
     private void actionAddConnection() {
     if (grafo.getCantidadEstaciones() < 2) {
         showAdvice("Aviso", "Se necesitan al menos 2 estaciones para crear una conexión.");
@@ -314,7 +379,7 @@ public class PanelPrincipalController {
     saveChange();
 }
 
-    
+       /** Elimina la estación elegida y sus conexiones, previa confirmación. */ 
     private void actionDeleteStation() {
     if (grafo.getCantidadEstaciones() == 0) {
         showAdvice("Aviso", "No hay estaciones para eliminar.");
@@ -343,7 +408,7 @@ public class PanelPrincipalController {
     grafo.EliminarEstacion(e.getId());
     saveChange();
 }
-    
+     /** Detecta las subredes, las lista en el área de resultados y las colorea en el grafo. */
     private void actionSubnets(){
       Estacion[][] subredes = analisis.DetectarSubredes();
     StringBuilder sb = new StringBuilder("Subredes encontradas: " + subredes.length + "\n");
@@ -359,6 +424,7 @@ public class PanelPrincipalController {
     grafoPanel1.colorSubredes(subredes);
     }
     
+    /** Calcula la ruta de menor tiempo entre origen y destino, la muestra y la resalta en el grafo. */
     private void actionRoute(){
      Estacion o = (Estacion) cbOrigen.getSelectedItem();
     Estacion d = (Estacion) cbDestino.getSelectedItem();
@@ -395,6 +461,7 @@ public class PanelPrincipalController {
     areaResults.setText(sb.toString());
     }
     
+    /** Identifica las estaciones con más conexiones, las muestra y las resalta en el grafo. */
     private void actionHubs(){
      Estacion[] ranking = analisis.IdentificarHubs();
     if (ranking.length == 0) {
@@ -408,7 +475,6 @@ public class PanelPrincipalController {
         return;
     }
 
-    // El ranking viene de mayor a menor grado: los empates quedan al principio
     int cuenta = 0;
     while (cuenta < ranking.length
             && grafo.ObtenerGrado(ranking[cuenta].getId()) == max) {
@@ -428,6 +494,7 @@ public class PanelPrincipalController {
     grafoPanel1.resaltHubs(hubs);
     }
     
+    /** Muestra el cuadro con las instrucciones de uso. */
     private void actionHelp() {
     String texto =
         """
@@ -456,12 +523,12 @@ public class PanelPrincipalController {
     JOptionPane.showMessageDialog(ventana, texto, "Cómo usar UrbanRoute",
             JOptionPane.INFORMATION_MESSAGE);
 }
-    
+    /** Vacía el área de resultados y quita los colores del grafo. */
     private void actionClear(){
         areaResults.setText("");
-        grafoPanel1.clearMarcar();
-    
+        grafoPanel1.clearMarcar(); 
     }
+    /** Llena los selectores de origen y destino con las estaciones de la red. */
     private void llenarCombos() {
     cbOrigen.removeAllItems();
     cbDestino.removeAllItems();
@@ -471,7 +538,7 @@ public class PanelPrincipalController {
         cbDestino.addItem( e);
     }
 }
-    
+    /** Carga los archivos maestros al iniciar; si no existen, avisa al usuario. */
     private void loadOrigin() {
     File est = gestor.getArchivoEstacionesMaestro();
     File con = gestor.getArchivoConexionesMaestro();
@@ -481,12 +548,24 @@ public class PanelPrincipalController {
     }
     loadFrom(est, con);
 }
+    
+     /**
+     * Muestra un diálogo de error.
+     *
+     * @param titulo título del diálogo
+     * @param mensaje texto del error
+     */
     private void showError(String titulo, String mensaje) {
     JOptionPane.showMessageDialog(ventana, mensaje, titulo, JOptionPane.ERROR_MESSAGE);
 }
 
 
-
+  /**
+     * Muestra un diálogo de aviso. Si el texto es largo, lo presenta en un área con desplazamiento.
+     *
+     * @param titulo título del diálogo
+     * @param mensaje texto del aviso
+     */
 private void showAdvice(String titulo, String mensaje) {
     Object content = mensaje;
     if (mensaje != null && mensaje.length() > 200) {
@@ -498,6 +577,13 @@ private void showAdvice(String titulo, String mensaje) {
     }
      JOptionPane.showMessageDialog(ventana, content, titulo, JOptionPane.WARNING_MESSAGE);
 }
+
+/**
+     * Abre el selector para elegir un archivo CSV existente.
+     *
+     * @param titulo título del selector
+     * @return archivo elegido, o null si se canceló
+     */
 private File chooseFile(String titulo) {
     javax.swing.JFileChooser fc = new javax.swing.JFileChooser();
     fc.setDialogTitle(titulo);
@@ -513,6 +599,13 @@ private File chooseFile(String titulo) {
     return null;
 }
 
+ /**
+     * Abre el selector para elegir dónde guardar un CSV, agrega la extensión si falta
+     * y pide confirmación si el archivo ya existe.
+     *
+     * @param titulo título del selector
+     * @return archivo elegido, o null si se canceló
+     */
 private File chooseSaveFile(String titulo) {
     javax.swing.JFileChooser fc = new javax.swing.JFileChooser();
     fc.setDialogTitle(titulo);
@@ -542,6 +635,13 @@ private File chooseSaveFile(String titulo) {
     return f;
 }
 
+/**
+     * Carga la red desde dos archivos CSV. Si ocurre un error de lectura se
+     * conserva la red anterior y se informa al usuario.
+     *
+     * @param estaciones archivo CSV con las estaciones
+     * @param conexiones archivo CSV con las conexiones
+     */
 private void loadFrom(File estaciones, File conexiones) {
     Grafo nuevo = new Grafo();
     gestor.reiniciarResultados();
@@ -566,7 +666,7 @@ private void loadFrom(File estaciones, File conexiones) {
                 gestor.getErrores());
     }
 }
-
+/** Redibuja el grafo, actualiza los selectores, los botones y la etiqueta de estado. */
     private void refresh() {
         grafoPanel1.draw(grafo);            
         llenarCombos();                        
@@ -579,6 +679,7 @@ private void loadFrom(File estaciones, File conexiones) {
         + (cambiosSinGuardar ? " | cambios sin guardar" : ""));   
     }
     
+    /** Marca que hay cambios sin guardar y refresca la pantalla. */
     private void saveChange() {
     cambiosSinGuardar = true;
     refresh();
