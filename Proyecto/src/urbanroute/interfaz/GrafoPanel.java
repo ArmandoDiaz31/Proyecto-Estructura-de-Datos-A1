@@ -5,10 +5,6 @@ package urbanroute.interfaz;
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JPanel.java to edit this template
  */
 
-/**
- *
- * @author josea
- */
 
 
 import urbanroute.modelo.Estacion;
@@ -30,6 +26,8 @@ public class GrafoPanel extends javax.swing.JPanel {
             add(vista, java.awt.BorderLayout.CENTER);
         }
     }
+        
+    
  
 public GrafoPanel() {
     initComponents();
@@ -55,11 +53,10 @@ private static final String[] colors = {"#E74C3C", "#3498DB", "#2ECC71", "#F39C1
 
 public void colorSubredes(Estacion[][] subredes) {
     for (int i = 0; i < subredes.length; i++) {
-        String color = colors[i % colors.length];
         for (Estacion e : subredes[i]) {
             org.graphstream.graph.Node n = visual.getNode(e.getId());
             if (n != null) {
-                n.setAttribute("ui.style", "fill-color: " + color + ";");
+                n.setAttribute("ui.class", "sub" + (i % colors.length));
             }
         }
     }
@@ -82,11 +79,16 @@ private static final String style =
     + "edge { fill-color: #7F8C8D; size: 2px; }"
     + "node.ruta { fill-color: #E74C3C; size: 26px; }"
     + "edge.ruta { fill-color: #E74C3C; size: 4px; }"
-    + "node.hub { fill-color: #F39C12; size: 28px; }";
+    + "node.hub { fill-color: #F39C12; size: 28px; }"    
+    + "node.sub0 { fill-color: #9B59B6; }"
+    + "node.sub1 { fill-color: #2ECC71; }"
+    + "node.sub2 { fill-color: #1ABC9C; }"
+    + "node.sub3 { fill-color: #3498DB; }"
+    + "node.sub4 { fill-color: #E84393; }"
+    + "node.sub5 { fill-color: #A0522D; }";
 
 public void clearMarcar() {
     visual.nodes().forEach(n -> n.removeAttribute("ui.class"));
-    visual.nodes().forEach(n -> n.removeAttribute("ui.style"));
     visual.edges().forEach(e -> e.removeAttribute("ui.class"));
 }
 

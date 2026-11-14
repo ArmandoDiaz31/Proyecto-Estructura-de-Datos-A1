@@ -83,6 +83,7 @@ public class PanelPrincipalController {
         this.itemHelp = itemHelp;
     }
 
+    
     public void start() {
         grafo = new Grafo();
         analisis = new AnalisisRed(grafo);
