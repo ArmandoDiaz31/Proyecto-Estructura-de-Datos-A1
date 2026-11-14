@@ -652,6 +652,15 @@ private void loadFrom(File estaciones, File conexiones) {
         showError("No se pudo leer el archivo", ex.getMessage());
         return;
     }
+        if (nuevo.getCantidadEstaciones() == 0) {
+        showAdvice("No se cargó ninguna estación",
+                """
+                Verifique que eligigió primero el archivo de ESTACIONES y luego el de CONEXIONES.
+                La red actual no se modificó.
+                
+                """ + gestor.getErrores());
+        return;
+    }
 
     grafo = nuevo;
     analisis = new AnalisisRed(grafo);
