@@ -14,7 +14,15 @@ import TDA.Nodo;
  * @author diegoarvelo
  */
 public class AnalisisRed {
-    private final Grafo grafo = new Grafo();
+   public final Grafo grafo;
+
+    public AnalisisRed() {
+        this(new Grafo());
+    }
+
+    public AnalisisRed(Grafo grafo) {
+        this.grafo = grafo;
+    }
     
     public ResultadoRuta CalcularRutaMasCorta(String idOrigen, String idDestino){
         Estacion Origen = grafo.ObtenerEstacion(idOrigen);
@@ -83,6 +91,7 @@ public class AnalisisRed {
         
         return new ResultadoRuta(Camino, Dist[idxDest], true);
     }
+    
     
     public Estacion[][] DetectarSubredes(){
         if (grafo.CantidadEstaciones == 0){
