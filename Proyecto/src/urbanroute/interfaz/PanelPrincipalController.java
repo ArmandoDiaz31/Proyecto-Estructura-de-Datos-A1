@@ -10,10 +10,7 @@ import TDA.Grafo;
 import urbanroute.modelo.AnalisisRed;
 import urbanroute.modelo.ResultadoRuta;
 
-/**
- *
- * @author josea
- */
+
 public class PanelPrincipalController {
     private Grafo grafo;
     private AnalisisRed analisis;
