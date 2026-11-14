@@ -6,21 +6,30 @@ package TDA;
  */
 
 /**
- *
+ * Representa la red de transporte como un grafo ponderado no dirigido mediante
+ * listas de adyacencia y tablas hash para búsquedas rápidas de orden O(1).
  * @author diegoarvelo
  */
 import urbanroute.modelo.Estacion;
 import urbanroute.modelo.Tramo;
 
 public class Grafo {
+    /** Capacidad inicial de los arreglos internos de estaciones y adyacencia. */
     private static final int CAPACIDAD_INICIAL = 64;
+    /** Arreglo que almacena las estaciones registradas en la red. */
     public Estacion[] estaciones;
+    /** Arreglo de listas enlazadas con los tramos conectados a cada estación. */
     public ListaEnlazada<Tramo>[] Adyacentes;
+    /** Cantidad actual de estaciones activas en el grafo. */
     public int CantidadEstaciones;
+    /** Cantidad actual de conexiones bidireccionales en la red. */
     public int CantidadConexiones;
+    /** Tabla hash para buscar estaciones rápidamente por su código ID. */
     private TablaHash IndicePorID;
+    /** Tabla hash para buscar estaciones rápidamente por su nombre. */
     private TablaHash IndicePorNombre;
     
+    /** Crea un grafo vacío inicializando los arreglos y las tablas hash. */
     public Grafo(){
         this.estaciones = new Estacion[CAPACIDAD_INICIAL];
         this.Adyacentes = (ListaEnlazada<Tramo>[]) new ListaEnlazada[CAPACIDAD_INICIAL];
@@ -30,6 +39,7 @@ public class Grafo {
         this.IndicePorNombre = new TablaHash();
     }
     
+    /** Vacía todas las estaciones y conexiones del grafo reiniciandolo. */
     public void Limpiar(){
         this.estaciones = new Estacion[CAPACIDAD_INICIAL];
         this.Adyacentes = (ListaEnlazada<Tramo>[]) new ListaEnlazada[CAPACIDAD_INICIAL];
@@ -39,6 +49,11 @@ public class Grafo {
         this.IndicePorNombre = new TablaHash();
     }
     
+    /**
+     * Registra una estación nueva en el grafo, crea su lista de adyacencia
+     * y la indexa en las tablas hash por ID y por nombre.
+     * @param e
+     */
     public void AgregarEstacion(Estacion e){
         if (e == null){
             throw new IllegalArgumentException("La estacion no puede ser nula.");
@@ -62,6 +77,10 @@ public class Grafo {
         }
     }
     
+    /** Busca y devuelve una estación en tiempo O(1) consultando por su ID o nombre. 
+     * @param Clave
+     * @return
+     */
     public Estacion ObtenerEstacion(String Clave){
         if (Clave == null || Clave.trim().isEmpty()){
             return null;
@@ -74,10 +93,18 @@ public class Grafo {
         return IndicePorNombre.buscar(Normal);
     }
     
+    /** Método auxiliar que delega la búsqueda rápida de una estación por nombre o ID. 
+     * @param NombreOid
+     * @return
+     */
     public Estacion buscarEstacion(String NombreOid){
         return ObtenerEstacion(NombreOid);
     }
     
+    /** Devuelve la estación ubicada en la posición del índice interno indicado. 
+     * @param Indice
+     * @return
+     */
     public Estacion ObtenerEstacionPorIndice(int Indice){
         if (Indice < 0 || Indice >= CantidadEstaciones){
             return null;
@@ -85,6 +112,10 @@ public class Grafo {
         return estaciones[Indice];
     }
     
+    /** Devuelve la lista de tramos adyacentes de una estación según su índice interno. 
+     * @return
+     * @param Indice
+     */
     public ListaEnlazada<Tramo> ObtenerAdyacentesPorIndice(int Indice){
         if (Indice < 0 || Indice >= CantidadEstaciones) {
             return null;
@@ -92,6 +123,9 @@ public class Grafo {
         return Adyacentes[Indice];
     }
     
+    /** Devuelve un arreglo con la copia de todas las estaciones activas en la red. 
+     * @return
+     */
     public Estacion[] ObtenerTodasLasEstaciones(){
         Estacion[] pCopia = new Estacion[CantidadEstaciones];
         for (int i = 0; i < CantidadEstaciones; i++){
@@ -100,6 +134,11 @@ public class Grafo {
         return pCopia;
     }
     
+    /** Verifica si existe un tramo directo que conecte las dos estaciones indicadas. 
+     * @return 
+     * @param idOrigen
+     * @param idDestino
+     */
     public boolean ExisteConexion(String idOrigen, String idDestino){
         Estacion Origen = ObtenerEstacion(idOrigen);
         Estacion Destino = ObtenerEstacion(idDestino);
@@ -109,6 +148,13 @@ public class Grafo {
         return BuscarTramo(Origen.getIndice(), Destino) != null;
     }
     
+    /**
+     * Crea una conexión de ida y vuelta entre dos estaciones existentes con el
+     * tiempo en minutos indicado.
+     * @param idOrigen
+     * @param idDestino
+     * @param TiempoMinutos
+     */
     public void AgregarConexion(String idOrigen, String idDestino, int TiempoMinutos){
         if (TiempoMinutos <= 0){
             throw new IllegalArgumentException("El tiempo de traslado debe ser mayor a 0 minutos.");
@@ -133,6 +179,11 @@ public class Grafo {
         CantidadConexiones++;
     }
     
+    /** Elimina la conexión directa en ambos sentidos entre las dos estaciones indicadas. 
+     * @return
+     * @param idOrigen
+     * @param idDestino
+     */
     public boolean EliminarConexion(String idOrigen, String idDestino){
         Estacion Origen = ObtenerEstacion(idOrigen);
         Estacion Destino = ObtenerEstacion(idDestino);
@@ -150,6 +201,12 @@ public class Grafo {
         return true;
     }
     
+    /**
+     * Elimina una estación junto con todos sus tramos conectados, dándola de baja
+     * tanto en el grafo como en las tablas hash.
+     * @return
+     * @param NombreOid
+     */
     public Estacion EliminarEstacion(String NombreOid){
         Estacion Objetivo = ObtenerEstacion(NombreOid);
         if(Objetivo == null){
@@ -192,6 +249,11 @@ public class Grafo {
         return Objetivo;
     }
     
+    /** Devuelve la duración en minutos entre dos índices de estación o cero si no están conectadas. 
+     * @return
+     * @param IndiceOrigen
+     * @param IndiceDestino
+     */
     public int getDuracion(int IndiceOrigen, int IndiceDestino){
         if (IndiceOrigen < 0 || IndiceOrigen >= CantidadEstaciones || IndiceDestino < 0 || IndiceDestino >= CantidadEstaciones){
             return 0;
@@ -205,14 +267,24 @@ public class Grafo {
         }
     }
     
+    /** Devuelve el número total de estaciones cargadas en el grafo. 
+     * @return
+     */
     public int getCantidadEstaciones(){
         return CantidadEstaciones;
     }
     
+    /** Devuelve el número total de conexiones existentes en el grafo. 
+     * @return
+     */
     public int getCantidadConexiones(){
         return CantidadConexiones;
     }
     
+    /** Devuelve la cantidad de conexiones directas (grado) que tiene una estación. 
+     *@return
+     * @param NombreOid
+     */
     public int ObtenerGrado(String NombreOid){
         Estacion e = ObtenerEstacion(NombreOid);
         if (e == null){
@@ -221,6 +293,11 @@ public class Grafo {
         return Adyacentes[e.getIndice()].Tamano();
     }
     
+    /** Busca en la lista de adyacencia del origen el tramo que apunta hacia la estación destino. 
+     * @return
+     * @param IndiceOrigen
+     * @param Destino
+     */
     private Tramo BuscarTramo(int IndiceOrigen, Estacion Destino){
         Nodo<Tramo> pAux = Adyacentes[IndiceOrigen].Primero();
         while (pAux != null){
@@ -232,6 +309,8 @@ public class Grafo {
         return null;
     }
     
+    /** Duplica el tamaño de los arreglos internos cuando se alcanza el límite de capacidad. 
+     */
     private void AsegurarCapacidad(){
         if (CantidadEstaciones < estaciones.length){
             return;
@@ -247,6 +326,10 @@ public class Grafo {
         this.Adyacentes = NewAdyac;
     }
     
+    /** Limpia los espacios laterales y convierte el texto a mayúsculas para usarlo como clave. 
+     * @param texto
+     * @return
+     */
     public static String NormalizarClave(String texto){
         if (texto == null){
             return "";

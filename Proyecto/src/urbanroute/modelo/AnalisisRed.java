@@ -10,20 +10,32 @@ import TDA.ListaEnlazada;
 import TDA.Nodo;
 
 /**
- *
+ * Ejecuta los algoritmos de análisis sobre el grafo de la red de transporte
  * @author diegoarvelo
  */
 public class AnalisisRed {
+   /** Grafo de la red de transporte sobre el cual se realizan los cálculos. */
    public final Grafo grafo;
-
+   
+   /** Cronstuctor de un analizador inicializando un grafo nuevo y vacío. */
     public AnalisisRed() {
         this(new Grafo());
     }
 
+    /** Cronstuctor de un analizador conectado al grafo recibido por parámetro. 
+     * @param grafo
+     */
     public AnalisisRed(Grafo grafo) {
         this.grafo = grafo;
     }
     
+    /**
+     * Calcula el trayecto de menor tiempo entre la estación de origen y destino
+     * aplicando el algoritmo de Dijkstra: retorna el camino y la duración total.
+     * @return 
+     * @param idOrigen
+     * @param idDestino
+     */
     public ResultadoRuta CalcularRutaMasCorta(String idOrigen, String idDestino){
         Estacion Origen = grafo.ObtenerEstacion(idOrigen);
         Estacion Destino = grafo.ObtenerEstacion(idDestino);
@@ -92,7 +104,11 @@ public class AnalisisRed {
         return new ResultadoRuta(Camino, Dist[idxDest], true);
     }
     
-    
+    /**
+     * Recorre la red en anchura (BFS) utilizando una cola propia para agrupar
+     * y retorna las subredes de estaciones que están conectadas entre sí.
+     * @return
+     */
     public Estacion[][] DetectarSubredes(){
         if (grafo.CantidadEstaciones == 0){
             return new Estacion[0][0];
@@ -143,6 +159,11 @@ public class AnalisisRed {
         return Resultado;
     }
     
+    /**
+     * Ordena y retorna las estaciones de mayor a menor según su cantidad
+     * de conexiones directas para identificar los hubs principales de la red.
+     * @return
+     */
     public Estacion[] IdentificarHubs() {
         Estacion[] Ranking = grafo.ObtenerTodasLasEstaciones();
         for (int i =1; i < Ranking.length; i ++){
